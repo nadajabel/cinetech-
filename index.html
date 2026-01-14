@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINE TECH - Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="layout-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>CINE TECH</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-target="dashboard">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="#movies" class="nav-item" data-target="movies">
+                    <span class="icon">🎬</span> Films
+                </a>
+                <a href="#categories" class="nav-item" data-target="categories">
+                    <span class="icon">🏷️</span> Catégories
+                </a>
+                <a href="#api" class="nav-item" data-target="api">
+                    <span class="icon">🌐</span> API & Stats
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2026 CINE TECH</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Navbar -->
+            <header class="top-navbar">
+                <div class="toggle-menu" id="toggle-menu">☰</div>
+                <div class="page-title">
+                    <h1 id="current-page-title">Dashboard</h1>
+                </div>
+                <div class="user-profile">
+                    <span>Admin User</span>
+                    <div class="avatar">A</div>
+                </div>
+            </header>
+
+            <!-- App Container for Views -->
+            <main id="app-container">
+
+                <!-- Section: Dashboard -->
+                <section id="dashboard" class="view-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Films</h3>
+                            <p id="kpi-total-movies" class="stat-value">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Note Moyenne</h3>
+                            <p id="kpi-avg-rating" class="stat-value">0.0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Catégories</h3>
+                            <p id="kpi-total-categories" class="stat-value">0</p>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <canvas id="moviesByGenreChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="moviesByYearChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Movies (Module 1) -->
+                <section id="movies" class="view-section hidden">
+                    <div class="toolbar">
+                        <input type="text" id="movie-search" placeholder="Rechercher un film..." class="search-input">
+                        <select id="movie-sort" class="sort-select">
+                            <option value="title">Alphabétique</option>
+                            <option value="rating">Note</option>
+                            <option value="year">Année</option>
+                        </select>
+                        <button id="btn-add-movie" class="btn btn-primary">+ Ajouter Film</button>
+                    </div>
+
+                    <!-- Movie Form (Hidden by default) -->
+                    <div id="movie-form-container" class="form-panel hidden">
+                        <h3 id="form-title">Nouveau Film</h3>
+                        <form id="movie-form">
+                            <input type="hidden" id="movie-id">
+                            <div class="form-group">
+                                <label>URL de l'affiche</label>
+                                <input type="url" id="movie-poster-url" placeholder="https://exemple.com/image.jpg">
+                            </div>
+                            <div class="form-group">
+                                <label>Ou importer une image (Laptop)</label>
+                                <input type="file" id="movie-poster" accept="image/*">
+                                <div id="poster-preview" class="hidden" style="margin-top: 10px;">
+                                    <img src="" alt="Aperçu"
+                                        style="max-width: 150px; border-radius: 4px; border: 1px solid #444;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Titre</label>
+                                <input type="text" id="movie-title" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Genre / Catégorie</label>
+                                <select id="movie-category" required>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Année</label>
+                                    <input type="number" id="movie-year" min="1900" max="2026" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Durée (min)</label>
+                                    <input type="number" id="movie-duration" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Note (0-10)</label>
+                                    <input type="number" id="movie-rating" min="0" max="10" step="0.1" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="btn-cancel-movie" class="btn btn-secondary">Annuler</button>
+                                <button type="submit" class="btn btn-success">Sauvegarder</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Movie List -->
+                    <div id="movies-list" class="grid-list">
+                        <!-- Movie Cards will be injected here -->
+                    </div>
+                </section>
+
+                <!-- Section: Categories (Module 2) -->
+                <section id="categories" class="view-section hidden">
+                    <div class="toolbar">
+                        <button id="btn-open-cat-form" class="btn btn-primary">+ Nouvelle Catégorie</button>
+                    </div>
+
+                    <!-- Category Form -->
+                    <div id="category-form-container" class="form-panel hidden">
+                        <h3>Ajouter une Catégorie</h3>
+                        <form id="category-form">
+                            <div class="form-group">
+                                <label>Nom de la catégorie</label>
+                                <input type="text" id="cat-name" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="btn-cancel-cat" class="btn btn-secondary">Annuler</button>
+                                <button type="submit" class="btn btn-success">Ajouter</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Films associés</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-list-body">
+                                <!-- Rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Section: API & Stats -->
+                <section id="api" class="view-section hidden">
+                    <div class="api-header">
+                        <h2>Données Externes (API)</h2>
+                        <button id="btn-fetch-api" class="btn btn-warning">🔄 Charger depuis TMDB/Mock</button>
+                    </div>
+                    <div id="api-loading" class="hidden">Chargement...</div>
+                    <div id="api-error" class="hidden error-msg"></div>
+
+                    <div class="api-results" id="api-results">
+                        <!-- API Data Display -->
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
